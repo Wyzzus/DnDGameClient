@@ -44,17 +44,13 @@ public class Location
     public string LocationName;
     public string Description;
     public string BackgroundImage;
-    public LocationObject[] LocationObjects;
-
-    [System.NonSerialized]
-    public Image Background;
+    public List<DndObject> LocationObjects;
 
     public Location()
     {
         this.LocationName = "";
         this.Description = "";
         this.BackgroundImage = "";
-        this.Background = null;
         this.LocationObjects = null;
     }
 
@@ -63,7 +59,6 @@ public class Location
         this.LocationName = loc.LocationName;
         this.Description = loc.Description;
         this.BackgroundImage = loc.BackgroundImage;
-        this.Background = loc.Background;
         this.LocationObjects = loc.LocationObjects;
     }
 }

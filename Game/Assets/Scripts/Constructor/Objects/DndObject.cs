@@ -2,17 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DndObject : MonoBehaviour
+[System.Serializable]
+public class DndObject
 {
-    // Start is called before the first frame update
-    void Start()
+    public string DndObjectName;
+    public string Description;
+    public string DndObjectImage;
+    public int Category = 0;
+
+    public DndObject()
     {
-        
+        this.DndObjectName = "";
+        this.Description = "";
+        this.DndObjectImage = "";
+        this.Category = 0;
     }
 
-    // Update is called once per frame
-    void Update()
+    public DndObject(DndObject dndObject)
     {
-        
+        this.DndObjectName = dndObject.DndObjectName;
+        this.Description = dndObject.Description;
+        this.DndObjectImage = dndObject.DndObjectImage;
+        this.Category = dndObject.Category;
     }
 }
