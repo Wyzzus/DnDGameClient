@@ -109,6 +109,7 @@ public class DndObjectEditor : MonoBehaviour
         Background.sprite = null;
         CategoryDropdown.value = 0;
         CurrentEditPart = null;
+        Background.rectTransform.sizeDelta = Vector2.zero;
     }
 
     public void AddCategory()

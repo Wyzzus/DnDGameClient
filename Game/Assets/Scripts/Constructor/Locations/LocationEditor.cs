@@ -11,6 +11,15 @@ public class LocationEditor : MonoBehaviour
     public InputField LocationDescription;
     public string ImagePath;
     public Image Background;
+    public GameObject test;
+
+    public Vector2 MouseClick;
+    public Vector2 ResultForVector;
+
+    [Header("Creating Objects")]
+    public RectTransform ContextMenu;
+    public GameObject AddMenu;
+    //public 
 
     public PartLocation CurrentEditPart;
 
@@ -95,7 +104,7 @@ public class LocationEditor : MonoBehaviour
         LocationName.text = "";
         LocationDescription.text = "";
         Background.sprite = null;
-
+        Background.rectTransform.sizeDelta = Vector2.zero;
         CurrentEditPart = null;
     }
 
@@ -108,6 +117,35 @@ public class LocationEditor : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetMouseButtonDown(1))
+        {
+            Vector2 newPos = Input.mousePosition;
+            GameObject clone = Instantiate(test.gameObject, Background.transform);
+            
+            clone.GetComponentInChildren<RectTransform>().position = newPos;
+            Vector2 local = clone.GetComponentInChildren<RectTransform>().anchoredPosition;
+            float x = Map(local.x, -300, 300, -2000, 2000);
+            float y = Map(local.y, -300, 300, -2000, 2000);
+            Vector2 result = new Vector2(x, y);
+            ContextMenu.anchoredPosition = local + Background.rectTransform.anchoredPosition;
+            ShowContextMenu();
+            Destroy(clone);
+        }
     }
+
+    public void ShowContextMenu()
+    {
+        ContextMenu.gameObject.SetActive(true);
+    }
+
+    public void AddObject()
+    {
+        AddMenu.SetActive(true);
+    }
+
+    public float Map(float x, float in_min, float in_max, float out_min, float out_max)
+    {
+        return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    }
+
 }

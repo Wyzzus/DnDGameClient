@@ -13,6 +13,11 @@ public class PackConstructor : MonoBehaviour
 
     public float ObjWidth = 325f;
     public float ObjHeight = 300f;
+
+    public float ObjAvatarWidth = 35f;
+    public float ObjAvatarHeigth = 35f;
+
+    public float MapMaxSize = 2000f;
     #endregion
 
     #region Singleton
