@@ -6,12 +6,20 @@ using UnityEngine.UI;
 public class ObjectView : MonoBehaviour
 {
     public DndObject dndObject;
+    public LocationObject locObject;
     public Image Avatar;
+    public Text Name;
 
-    public void Setup(DndObject dndObject)
+    public void Setup(DndObject dndObject, LocationObject lo = null)
     {
         this.dndObject = dndObject;
-        StartCoroutine(LoadImage(dndObject.DndObjectImage));
+        Name.text = dndObject.DndObjectName;
+        if(lo != null)
+            locObject = lo;
+        if (dndObject.DndObjectImage != "")
+        {
+            StartCoroutine(LoadImage(dndObject.DndObjectImage));
+        }
     }
 
     public IEnumerator LoadImage(string url)
@@ -48,6 +56,12 @@ public class ObjectView : MonoBehaviour
         }
 
         Avatar.rectTransform.sizeDelta = new Vector2(newWidth, newHeight);
+    }
+
+    public void DeleteView()
+    {
+        PackConstructor.instance.LocationEditorWindow.GetComponent<LocationEditor>().LocationObjects.Remove(locObject);
+        Destroy(gameObject);
     }
 
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PackConstructor : MonoBehaviour
 {
-    #region UIConfig
+    [Header ("UIConfig")]
     public float LocationPartHeight = 100f;
     public float LocationViewWidth = 275f;
 
@@ -17,8 +17,7 @@ public class PackConstructor : MonoBehaviour
     public float ObjAvatarWidth = 35f;
     public float ObjAvatarHeigth = 35f;
 
-    public float MapMaxSize = 2000f;
-    #endregion
+    public float MapMaxSize = 4000f;
 
     #region Singleton
 
@@ -73,6 +72,7 @@ public class PackConstructor : MonoBehaviour
     public void OpenLocationEditor()
     {
         LocationEditorWindow.SetActive(true);
+        LocationEditorWindow.GetComponent<LocationEditor>().RefreshObjectScrollPanel();
     }
 
     public PartLocation AddLocationPart()

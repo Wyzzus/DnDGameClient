@@ -17,6 +17,13 @@ public class SerVect3
         this.z = z;
     }
 
+    public SerVect3(SerVect3 vector)
+    {
+        this.x = vector.x;
+        this.y = vector.y;
+        this.z = vector.z;
+    }
+
     public SerVect3(Vector3 vector)
     {
         this.x = vector.x;
@@ -36,6 +43,20 @@ public class LocationObject
     public DndObject Object;
     public string ObjectName;
     public SerVect3 Position;
+
+    public LocationObject()
+    {
+        this.Object = null;
+        this.ObjectName = "";
+        this.Position = null;
+    }
+
+    public LocationObject(LocationObject loc)
+    {
+        this.Object = loc.Object;
+        this.ObjectName = loc.ObjectName;
+        this.Position = new SerVect3(loc.Position);
+    }
 }
 
 [System.Serializable]
@@ -44,7 +65,7 @@ public class Location
     public string LocationName;
     public string Description;
     public string BackgroundImage;
-    public List<DndObject> LocationObjects;
+    public List<LocationObject> LocationObjects;
 
     public Location()
     {
