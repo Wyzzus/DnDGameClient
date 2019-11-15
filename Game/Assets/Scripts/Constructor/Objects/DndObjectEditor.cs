@@ -146,10 +146,6 @@ public class DndObjectEditor : MonoBehaviour
     public void UpdateCategories()
     {
         CategoryDropdown.ClearOptions();
-        foreach(RectTransform child in CategoriesView.GetComponentInChildren<RectTransform>())
-        {
-            Destroy(child.gameObject);
-        }
 
         foreach (string cat in PackConstructor.instance.ObjectsCategories)
         {
