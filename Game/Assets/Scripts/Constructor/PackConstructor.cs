@@ -143,6 +143,7 @@ public class PackConstructor : MonoBehaviour
     {
         DndObjectEditorWindow.SetActive(true);
         DndObjectEditorWindow.GetComponent<DndObjectEditor>().UpdateCategories();
+        DndObjectEditorWindow.GetComponent<DndObjectEditor>().ShowCategories();
     }
 
     public PartDndObject AddDndObjectPart()

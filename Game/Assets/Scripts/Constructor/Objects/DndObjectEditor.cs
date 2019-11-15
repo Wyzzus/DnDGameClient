@@ -127,9 +127,30 @@ public class DndObjectEditor : MonoBehaviour
         UpdateCategories();
     }
 
+    public void ShowCategories()
+    {
+        foreach (RectTransform child in CategoriesView.GetComponentInChildren<RectTransform>())
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (string cat in PackConstructor.instance.ObjectsCategories)
+        {
+            GameObject clone = Instantiate(CategoryPart, CategoriesView);
+            clone.GetComponentInChildren<CategoryPart>().Setup(cat);
+        }
+        int cnt = PackConstructor.instance.ObjectsCategories.Count;
+        RecalculateViewSize(CategoriesView, cnt, 0, 30f);
+
+    }
+
     public void UpdateCategories()
     {
         CategoryDropdown.ClearOptions();
+        foreach(RectTransform child in CategoriesView.GetComponentInChildren<RectTransform>())
+        {
+            Destroy(child.gameObject);
+        }
+
         foreach (string cat in PackConstructor.instance.ObjectsCategories)
         {
             Dropdown.OptionData data = new Dropdown.OptionData();
