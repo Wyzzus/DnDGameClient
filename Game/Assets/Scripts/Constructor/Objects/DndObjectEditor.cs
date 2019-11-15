@@ -30,6 +30,11 @@ public class DndObjectEditor : MonoBehaviour
         StartCoroutine(LoadImage(dndObject.DndObjectImage));
     }
 
+    void Start()
+    {
+        UpdateCategories();
+    }
+
     public void AddImage()
     {
         var paths = StandaloneFileBrowser.OpenFilePanel("Добавить объект", Application.dataPath, "", false);

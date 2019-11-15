@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using SFB;
+using UnityEngine.UI;
 
 public class PackConstructor : MonoBehaviour
 {
@@ -45,6 +47,8 @@ public class PackConstructor : MonoBehaviour
     public RectTransform LocationView;
     public RectTransform DndObjectView;
 
+    public InputField PackNamer;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -55,6 +59,54 @@ public class PackConstructor : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void SavePack()
+    {
+        string packName = "NewThemePack";
+        string extension = "hgd";
+        var paths = StandaloneFileBrowser.SaveFilePanel("Сохранить пак", Application.dataPath, packName, extension);
+        string[] dirs = paths.Split('\\');
+        string packPath = "";
+        for(int i = 0; i < dirs.Length - 2; i++)
+        {
+            packPath += dirs[i] + "\\";
+        }
+        packPath += dirs[dirs.Length - 2];
+        packName = dirs[dirs.Length - 1].Replace("." + extension, "");
+        ThemePack tp = new ThemePack(PackNamer.text, Locations, DndObjects, ObjectsCategories);
+        tp.SavePack(packPath, packName, extension);
+    }
+
+    public void LoadPack()
+    {
+        string extension = "hgd";
+        var path = StandaloneFileBrowser.OpenFilePanel("Открыть пак", Application.dataPath, extension, false);
+        ThemePack tp = new ThemePack();
+        tp = tp.LoadPack(path[0]);
+        Debug.Log(path[0]);
+        this.Locations = tp.Locations;
+        this.DndObjects = tp.DndObjects;
+        this.ObjectsCategories = tp.ObjectsCategories;
+        PackNamer.text = tp.PackName;
+        ShowLoadedPack();
+    }
+
+    public void ShowLoadedPack()
+    {
+        foreach(Location loc in Locations)
+        {
+            PartLocation pl = AddLocationPart();
+            pl.MyLocation = loc;
+            pl.UpdateLocation();
+        }
+
+        foreach (DndObject obj in DndObjects)
+        {
+            PartDndObject po = AddDndObjectPart();
+            po.MyDndObject = obj;
+            po.UpdateDndObject();
+        }
     }
 
     public void HideEditor(GameObject EditorWindow)
@@ -90,6 +142,7 @@ public class PackConstructor : MonoBehaviour
     public void OpenDndObjectEditor()
     {
         DndObjectEditorWindow.SetActive(true);
+        DndObjectEditorWindow.GetComponent<DndObjectEditor>().UpdateCategories();
     }
 
     public PartDndObject AddDndObjectPart()
