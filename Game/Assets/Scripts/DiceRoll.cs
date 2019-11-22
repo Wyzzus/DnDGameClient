@@ -29,7 +29,8 @@ public class DiceRoll : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             Result.text += ".";
-            yield return new WaitForSeconds(0.2F);
+            yield return new WaitForSeconds(0.4F);
         }
+        Result.text = "Выпало " + Random.Range(1, n + 1);
     }
 }
