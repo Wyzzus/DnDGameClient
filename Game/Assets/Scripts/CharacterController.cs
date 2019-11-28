@@ -13,8 +13,11 @@ public class CharacterController : MonoBehaviour
     public Dropdown ClassesMenu;
     public Dropdown SkinMenu;
     public GameObject Character;
+    Vector2 startPosition;
     SpriteRenderer Skin;
-    
+
+    public RectTransform me;
+
 
     private void Start()
     {
@@ -22,9 +25,10 @@ public class CharacterController : MonoBehaviour
         ClassesList = Directory.GetDirectories("Assets/Resources/Sprites/Classes");
         ClassesMenu.options.Clear();
         foreach (string option in ClassesList)
-        { 
-            ClassesMenu.options.Add(new Dropdown.OptionData(option.Substring(option.LastIndexOf(@"\")+1)));
+        {
+            ClassesMenu.options.Add(new Dropdown.OptionData(option.Substring(option.LastIndexOf(@"\") + 1)));
         }
+        startPosition = me.anchoredPosition3D;
         UpdateSkinMenu();
     }
 
@@ -43,5 +47,17 @@ public class CharacterController : MonoBehaviour
         Debug.Log(SkinMenu.options[SkinMenu.value].text);
         Skin.sprite = Resources.Load<Sprite>("Sprites/Classes/" + ClassesMenu.options[ClassesMenu.value].text + "/" +
             SkinMenu.options[SkinMenu.value].text.Remove(SkinMenu.options[SkinMenu.value].text.LastIndexOf(".")));
+    }
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            float t = 0;
+            t = Time.deltaTime * 2f;
+            //me.anchoredPosition3D = new Vector2(Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height / 2
+            me.anchoredPosition3D = Vector2.Lerp(startPosition, new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2), Time.deltaTime);
+            startPosition = me.anchoredPosition;
+        }
     }
 }
