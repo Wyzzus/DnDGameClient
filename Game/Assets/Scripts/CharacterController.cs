@@ -51,12 +51,12 @@ public class CharacterController : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(1))
         {
             float t = 0;
             t = Time.deltaTime * 2f;
-            //me.anchoredPosition3D = new Vector2(Input.mousePosition.x - Screen.width/2, Input.mousePosition.y - Screen.height / 2
-            me.anchoredPosition3D = Vector2.Lerp(startPosition, new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2), Time.deltaTime);
+            me.anchoredPosition3D = new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2);
+            //me.anchoredPosition3D = Vector2.Lerp(startPosition, new Vector2(Input.mousePosition.x - Screen.width / 2, Input.mousePosition.y - Screen.height / 2), Time.deltaTime);
             startPosition = me.anchoredPosition;
         }
     }
