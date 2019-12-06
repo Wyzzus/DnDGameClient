@@ -17,12 +17,6 @@ public class PlayerController : MonoBehaviour
     [Header("UI")]
     public Text RollOutput;
     public Dropdown ClassSelector;
-
-    public void Start()
-    {
-
-    }
-
     public void Update()
     {
         MovePlayer();
@@ -40,7 +34,6 @@ public class PlayerController : MonoBehaviour
                 NewPosition = hit.point;
             }
         }
-
         Pointer.position = Vector3.Lerp(Pointer.position, NewPosition, DampTime * Time.deltaTime);
     }
 
