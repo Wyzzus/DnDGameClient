@@ -11,6 +11,7 @@ public class ThemePack
     public List<Location> Locations = new List<Location>();
     public List<DndObject> DndObjects = new List<DndObject>();
     public List<string> ObjectsCategories = new List<string>();
+    public List<Avatar> Avatars = new List<Avatar>();
 
     public ThemePack()
     {
@@ -19,12 +20,13 @@ public class ThemePack
         ObjectsCategories = new List<string>();
     }
 
-    public ThemePack(string PackName, List<Location> Locations, List<DndObject> DndObjects, List<string> ObjectsCategories)
+    public ThemePack(string PackName, List<Location> Locations, List<DndObject> DndObjects, List<string> ObjectsCategories, List<Avatar> Avatars)
     {
         this.PackName = PackName;
         this.Locations = Locations;
         this.DndObjects = DndObjects;
         this.ObjectsCategories = ObjectsCategories;
+        this.Avatars = Avatars;
     }
 
     public void SavePack(string Path, string Name, string Extension)
@@ -66,6 +68,14 @@ public class ThemePack
             obj.DndObjectImage = obj.DndObjectName + "." + PackConstructor.instance.ImageExtension;
         }
 
+        foreach (Avatar obj in Avatars)
+        {
+            string NewPath = ImageFolder + "\\" + obj.AvatarName + "." + PackConstructor.instance.ImageExtension;
+            File.Copy(obj.AvatarImage, NewPath);
+            Debug.Log(NewPath);
+            obj.AvatarImage = obj.AvatarName + "." + PackConstructor.instance.ImageExtension;
+        }
+
 
     }
 
@@ -97,16 +107,31 @@ public class ThemePack
         }
 
         PackConstructor con = PackConstructor.instance;
-        foreach (Location obj in pack.Locations)
+        if(pack.Locations != null)
         {
-            string NewPath = con.CurrentPackFolder + con.ImageFolder + "\\" + obj.LocationName + "." + PackConstructor.instance.ImageExtension;
-            obj.BackgroundImage = NewPath;
+            foreach (Location obj in pack.Locations)
+            {
+                string NewPath = con.CurrentPackFolder + con.ImageFolder + "\\" + obj.LocationName + "." + PackConstructor.instance.ImageExtension;
+                obj.BackgroundImage = NewPath;
+            }
         }
 
-        foreach (DndObject obj in pack.DndObjects)
+        if (pack.DndObjects != null)
         {
-            string NewPath = con.CurrentPackFolder + con.ImageFolder + "\\" + obj.DndObjectName + "." + PackConstructor.instance.ImageExtension;
-            obj.DndObjectImage = NewPath;
+            foreach (DndObject obj in pack.DndObjects)
+            {
+                string NewPath = con.CurrentPackFolder + con.ImageFolder + "\\" + obj.DndObjectName + "." + PackConstructor.instance.ImageExtension;
+                obj.DndObjectImage = NewPath;
+            }
+        }
+
+        if(pack.Avatars != null)
+        {
+            foreach (Avatar obj in pack.Avatars)
+            {
+                string NewPath = con.CurrentPackFolder + con.ImageFolder + "\\" + obj.AvatarName + "." + PackConstructor.instance.ImageExtension;
+                obj.AvatarImage = NewPath;
+            }
         }
 
 

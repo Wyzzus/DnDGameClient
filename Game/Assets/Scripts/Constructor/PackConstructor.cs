@@ -40,6 +40,7 @@ public class PackConstructor : MonoBehaviour
     public List<Location> Locations = new List<Location>();
     public List<DndObject> DndObjects = new List<DndObject>();
     public List<string> ObjectsCategories = new List<string>();
+    public List<Avatar> Avatars = new List<Avatar>();
 
     [Header("Editors")]
     public GameObject LocationEditorWindow;
@@ -48,9 +49,13 @@ public class PackConstructor : MonoBehaviour
     public GameObject DndObjectEditorWindow;
     public GameObject DndObjectPartPrefab;
 
+    public GameObject AvatarEditorWindow;
+    public GameObject AvatarEditorPartPrefab;
+
     [Header("Tables Views")]
     public RectTransform LocationView;
     public RectTransform DndObjectView;
+    public RectTransform AvatarView;
 
     public InputField PackNamer;
     
@@ -80,7 +85,7 @@ public class PackConstructor : MonoBehaviour
         }
         packPath += dirs[dirs.Length - 2];
         packName = dirs[dirs.Length - 1].Replace("." + extension, "");
-        ThemePack tp = new ThemePack(PackNamer.text, Locations, DndObjects, ObjectsCategories);
+        ThemePack tp = new ThemePack(PackNamer.text, Locations, DndObjects, ObjectsCategories, Avatars);
         tp.SavePack(packPath, packName, extension);
         OpenPack(packPath);
 
@@ -112,9 +117,13 @@ public class PackConstructor : MonoBehaviour
         CurrentPackFolder = packPath;
         tp = tp.LoadPack(path);
 
+
         this.Locations = tp.Locations;
         this.DndObjects = tp.DndObjects;
         this.ObjectsCategories = tp.ObjectsCategories;
+        this.Avatars = tp.Avatars;
+
+
         PackNamer.text = tp.PackName;
         ShowLoadedPack();
     }
@@ -130,6 +139,7 @@ public class PackConstructor : MonoBehaviour
     {
         ClearView(LocationView);
         ClearView(DndObjectView);
+        ClearView(AvatarView);
         foreach (Location loc in Locations)
         {
             PartLocation pl = AddLocationPart();
@@ -142,6 +152,13 @@ public class PackConstructor : MonoBehaviour
             PartDndObject po = AddDndObjectPart();
             po.MyDndObject = obj;
             po.UpdateDndObject();
+        }
+
+        foreach (Avatar obj in Avatars)
+        {
+            PartAvatar pa = AddAvatarPart();
+            pa.MyAvatar = obj;
+            pa.UpdateAvatar();
         }
     }
 
@@ -190,4 +207,21 @@ public class PackConstructor : MonoBehaviour
     }
 
     #endregion
+
+    #region Avatars
+
+    public void OpenAvatarEditor()
+    {
+        AvatarEditorWindow.SetActive(true);
+    }
+
+    public PartAvatar AddAvatarPart()
+    {
+        RecalculateViewSize(AvatarView, Avatars.Count, 1, LocationPartHeight);
+        GameObject clone = Instantiate(AvatarEditorPartPrefab, AvatarView);
+        return clone.GetComponentInChildren<PartAvatar>();
+    }
+
+    #endregion
+
 }
