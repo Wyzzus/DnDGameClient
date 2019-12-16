@@ -12,7 +12,7 @@ public class PartDndObject : MonoBehaviour
     {
         DndObjectEditor editor = PackConstructor.instance.DndObjectEditorWindow.GetComponent<DndObjectEditor>();
         PackConstructor.instance.OpenDndObjectEditor();
-        editor.EditObject(MyDndObject, this);
+        editor.EditObject(MyDndObject, this, true);
     }
 
     public void Delete()
