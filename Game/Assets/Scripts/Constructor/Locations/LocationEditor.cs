@@ -26,18 +26,29 @@ public class LocationEditor : MonoBehaviour
 
     public PartLocation CurrentEditPart;
 
-    public void EditLocation(Location location, PartLocation Part)
+    public void EditLocation(Location location, PartLocation Part, bool newImage)
     {
         this.CurrentEditPart = Part;
         LocationName.text = location.LocationName;
         LocationDescription.text = location.Description;
-        StartCoroutine(LoadImage(location.BackgroundImage));
+        PackConstructor con = PackConstructor.instance;
+        if(newImage)
+        {
+            StartCoroutine(LoadImage(location.BackgroundImage));
+            Debug.Log(location.BackgroundImage);
+        }
+        else
+        {
+            StartCoroutine(LoadImage(con.CurrentPackFolder + con.ImageFolder + "\\" + location.LocationName + "." + con.ImageExtension));
+            Debug.Log(con.CurrentPackFolder + con.ImageFolder + "\\" + location.BackgroundImage);
+        }
         SetupLocationObjects();
     }
 
     public void AddImage()
     {
-        var paths = StandaloneFileBrowser.OpenFilePanel("Добавить локацию", Application.dataPath, "", false);
+        string ext = PackConstructor.instance.ImageExtension;
+        var paths = StandaloneFileBrowser.OpenFilePanel("Добавить локацию", Application.dataPath, ext, false);
         if (paths.Length > 0)
         {
             if(paths[0].Length > 0)

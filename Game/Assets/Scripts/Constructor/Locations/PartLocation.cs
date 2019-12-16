@@ -12,7 +12,7 @@ public class PartLocation : MonoBehaviour
     {
         LocationEditor editor = PackConstructor.instance.LocationEditorWindow.GetComponent<LocationEditor>();
         PackConstructor.instance.OpenLocationEditor();
-        editor.EditLocation(MyLocation, this);
+        editor.EditLocation(MyLocation, this, true);
     }
 
     public void DeleteLocation()

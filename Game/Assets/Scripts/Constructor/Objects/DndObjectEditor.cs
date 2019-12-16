@@ -21,13 +21,21 @@ public class DndObjectEditor : MonoBehaviour
     public RectTransform CategoriesView;
     public Dropdown CategoryDropdown;
 
-    public void EditObject(DndObject dndObject, PartDndObject Part)
+    public void EditObject(DndObject dndObject, PartDndObject Part, bool newImage)
     {
+        PackConstructor con = PackConstructor.instance;
         this.CurrentEditPart = Part;
         DndObjectName.text = dndObject.DndObjectName;
         DndObjectDescription.text = dndObject.Description;
         CategoryDropdown.value = dndObject.Category;
-        StartCoroutine(LoadImage(dndObject.DndObjectImage));
+        if(newImage)
+        {
+            StartCoroutine(LoadImage(dndObject.DndObjectImage));
+        }
+        else
+        {
+            StartCoroutine(LoadImage(con.CurrentPackFolder + con.ImageFolder + "\\" + dndObject.DndObjectName + "." + con.ImageExtension));
+        }
     }
 
     void Start()
@@ -37,7 +45,8 @@ public class DndObjectEditor : MonoBehaviour
 
     public void AddImage()
     {
-        var paths = StandaloneFileBrowser.OpenFilePanel("Добавить объект", Application.dataPath, "", false);
+        string ext = PackConstructor.instance.ImageExtension;
+        var paths = StandaloneFileBrowser.OpenFilePanel("Добавить объект", Application.dataPath, ext, false);
         if (paths.Length > 0)
         {
             StartCoroutine(LoadImage(paths[0]));

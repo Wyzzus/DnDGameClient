@@ -25,7 +25,7 @@ public class PlayerController : MonoBehaviour
 
     public void SetClass()
     {
-        Data.Class = ClassSelector.value;
+        //Data.Class = ClassSelector.value;
     }
 
     public void MovePlayer()

@@ -44,7 +44,7 @@ public class ThemePack
 
     public void SaveImages(string packFolder)
     {
-        string ImageFolder = packFolder + "\\Images";
+        string ImageFolder = packFolder + "\\" + PackConstructor.instance.ImageFolder;
         if (!Directory.Exists(ImageFolder))
         {
             Directory.CreateDirectory(ImageFolder);
@@ -52,16 +52,18 @@ public class ThemePack
 
         foreach(Location obj in Locations)
         {
-            string NewPath = ImageFolder + "\\" + GetImageName(obj.BackgroundImage);
+            string NewPath = ImageFolder + "\\" + obj.LocationName + "." + PackConstructor.instance.ImageExtension;
             File.Copy(obj.BackgroundImage, NewPath);
-            obj.BackgroundImage = NewPath;//GetImageName(obj.BackgroundImage);
+            Debug.Log(NewPath);
+            obj.BackgroundImage = obj.LocationName + "." + PackConstructor.instance.ImageExtension;
         }
 
         foreach (DndObject obj in DndObjects)
         {
-            string NewPath = ImageFolder + "\\" + GetImageName(obj.DndObjectImage);
+            string NewPath = ImageFolder + "\\" + obj.DndObjectName + "." + PackConstructor.instance.ImageExtension;
             File.Copy(obj.DndObjectImage, NewPath);
-            obj.DndObjectImage = NewPath;//GetImageName(obj.DndObjectImage);
+            Debug.Log(NewPath);
+            obj.DndObjectImage = obj.DndObjectName + "." + PackConstructor.instance.ImageExtension;
         }
 
 
@@ -93,6 +95,21 @@ public class ThemePack
                 fs.Close();
             }
         }
+
+        PackConstructor con = PackConstructor.instance;
+        foreach (Location obj in pack.Locations)
+        {
+            string NewPath = con.CurrentPackFolder + con.ImageFolder + "\\" + obj.LocationName + "." + PackConstructor.instance.ImageExtension;
+            obj.BackgroundImage = NewPath;
+        }
+
+        foreach (DndObject obj in pack.DndObjects)
+        {
+            string NewPath = con.CurrentPackFolder + con.ImageFolder + "\\" + obj.DndObjectName + "." + PackConstructor.instance.ImageExtension;
+            obj.DndObjectImage = NewPath;
+        }
+
+
         return pack;
     }
 }

@@ -21,6 +21,10 @@ public class PackConstructor : MonoBehaviour
 
     public float MapMaxSize = 4000f;
 
+    [Header("Global Config")]
+    public string ImageFolder = "Images";
+    public string ImageExtension = "png";
+
     #region Singleton
 
     public static PackConstructor instance;
@@ -32,6 +36,7 @@ public class PackConstructor : MonoBehaviour
 
     #endregion
     [Header("Pack Parts")]
+    public string CurrentPackFolder;
     public List<Location> Locations = new List<Location>();
     public List<DndObject> DndObjects = new List<DndObject>();
     public List<string> ObjectsCategories = new List<string>();
@@ -48,6 +53,7 @@ public class PackConstructor : MonoBehaviour
     public RectTransform DndObjectView;
 
     public InputField PackNamer;
+    
 
     // Start is called before the first frame update
     void Start()
@@ -76,15 +82,36 @@ public class PackConstructor : MonoBehaviour
         packName = dirs[dirs.Length - 1].Replace("." + extension, "");
         ThemePack tp = new ThemePack(PackNamer.text, Locations, DndObjects, ObjectsCategories);
         tp.SavePack(packPath, packName, extension);
+        OpenPack(packPath);
+
     }
 
-    public void LoadPack()
+    public void ClearView(RectTransform view)
     {
-        string extension = "hgd";
-        var path = StandaloneFileBrowser.OpenFilePanel("Открыть пак", Application.dataPath, extension, false);
+        foreach (RectTransform rt in view.GetComponentsInChildren<RectTransform>())
+        {
+            if(rt != view)
+            {
+                Destroy(rt.gameObject);
+            }
+        }
+    }
+
+    public void OpenPack(string path)
+    {
         ThemePack tp = new ThemePack();
-        tp = tp.LoadPack(path[0]);
-        Debug.Log(path[0]);
+        //Debug.Log(path[0]);
+
+        string[] dirs = path.Split('\\');
+        string packPath = "";
+        for (int i = 0; i < dirs.Length - 1; i++)
+        {
+            packPath += dirs[i] + "\\";
+        }
+
+        CurrentPackFolder = packPath;
+        tp = tp.LoadPack(path);
+
         this.Locations = tp.Locations;
         this.DndObjects = tp.DndObjects;
         this.ObjectsCategories = tp.ObjectsCategories;
@@ -92,9 +119,18 @@ public class PackConstructor : MonoBehaviour
         ShowLoadedPack();
     }
 
+    public void LoadPack()
+    {
+        string extension = "hgd";
+        var path = StandaloneFileBrowser.OpenFilePanel("Открыть пак", Application.dataPath, extension, false);
+        OpenPack(path[0]);
+    }
+
     public void ShowLoadedPack()
     {
-        foreach(Location loc in Locations)
+        ClearView(LocationView);
+        ClearView(DndObjectView);
+        foreach (Location loc in Locations)
         {
             PartLocation pl = AddLocationPart();
             pl.MyLocation = loc;
