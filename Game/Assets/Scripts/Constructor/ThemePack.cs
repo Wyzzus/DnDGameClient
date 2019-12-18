@@ -14,6 +14,7 @@ public class ThemePack
     public List<Avatar> Avatars = new List<Avatar>();
     public List<Attribute> Attributes = new List<Attribute>();
     public List<Item> Items = new List<Item>();
+    public List<Effect> Effects = new List<Effect>();
 
     public ThemePack()
     {
@@ -23,6 +24,7 @@ public class ThemePack
         Avatars = new List<Avatar>();
         Attributes = new List<Attribute>();
         Items = new List<Item>();
+        Effects = new List<Effect>();
     }
 
     public ThemePack(
@@ -31,7 +33,7 @@ public class ThemePack
         List<DndObject> DndObjects, 
         List<string> ObjectsCategories, 
         List<Avatar> Avatars, 
-        List<Attribute> Attributes, List<Item> Items)
+        List<Attribute> Attributes, List<Item> Items, List<Effect> Effects)
     {
         this.PackName = PackName;
         this.Locations = Locations;
@@ -40,6 +42,7 @@ public class ThemePack
         this.Avatars = Avatars;
         this.Attributes = Attributes;
         this.Items = Items;
+        this.Effects = Effects;
     }
 
     public void SavePack(string Path, string Name, string Extension)

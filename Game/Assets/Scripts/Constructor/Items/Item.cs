@@ -24,7 +24,8 @@ public class Item
         this.ItemName = item.ItemName;
         this.Description = item.Description;
         this.ItemImage = item.ItemImage;
-        foreach(Attribute at in item.Attributes)
+        Attributes = new List<Attribute>();
+        foreach (Attribute at in item.Attributes)
         {
             this.Attributes.Add(new Attribute(at));
         }
