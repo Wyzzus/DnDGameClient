@@ -25,6 +25,9 @@ public class PackConstructor : MonoBehaviour
     public string ImageFolder = "Images";
     public string ImageExtension = "png";
 
+    public float DefaultMinTime = 120f;
+    public float DefaultMaxTime = 180f;
+
     #region Singleton
 
     public static PackConstructor instance;
@@ -44,6 +47,10 @@ public class PackConstructor : MonoBehaviour
     public List<Attribute> Attributes = new List<Attribute>();
     public List<Item> Items = new List<Item>();
     public List<Effect> Effects = new List<Effect>();
+    public List<DndEvent> DndEvents = new List<DndEvent>();
+    public float MinEventTime = 120;
+    public float MaxEventTime = 180;
+   
 
     [Header("Editors")]
     public GameObject LocationEditorWindow;
@@ -64,6 +71,9 @@ public class PackConstructor : MonoBehaviour
     public GameObject EffectEditorWindow;
     public GameObject EffectEditorPartPrefab;
 
+    public GameObject DndEventEditorWindow;
+    public GameObject DndEventEditorPartPrefab;
+
     [Header("Tables Views")]
     public RectTransform LocationView;
     public RectTransform DndObjectView;
@@ -71,6 +81,7 @@ public class PackConstructor : MonoBehaviour
     public RectTransform AttributeView;
     public RectTransform ItemView;
     public RectTransform EffectView;
+    public RectTransform DndEventView;
 
     public InputField PackNamer;
     
@@ -78,7 +89,9 @@ public class PackConstructor : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        LoadPackTest();
+        //LoadPackTest();
+        MinEventTime = DefaultMinTime;
+        MaxEventTime = DefaultMaxTime;
     }
 
     // Update is called once per frame
@@ -100,7 +113,7 @@ public class PackConstructor : MonoBehaviour
         }
         packPath += dirs[dirs.Length - 2];
         packName = dirs[dirs.Length - 1].Replace("." + extension, "");
-        ThemePack tp = new ThemePack(PackNamer.text, Locations, DndObjects, ObjectsCategories, Avatars, Attributes, Items, Effects);
+        ThemePack tp = new ThemePack(PackNamer.text, Locations, DndObjects, ObjectsCategories, Avatars, Attributes, Items, Effects, DndEvents, MinEventTime, MaxEventTime);
         tp.SavePack(packPath, packName, extension);
         OpenPack(packPath);
 
@@ -133,14 +146,16 @@ public class PackConstructor : MonoBehaviour
         tp = tp.LoadPack(path);
 
 
-        this.Locations = tp.Locations;
-        this.DndObjects = tp.DndObjects;
-        this.ObjectsCategories = tp.ObjectsCategories;
-        this.Avatars = tp.Avatars;
-        this.Attributes = tp.Attributes;
-        this.Items = tp.Items;
-        this.Effects = tp.Effects;
-
+        this.Locations = (tp.Locations != null) ? tp.Locations : new List<Location>();
+        this.DndObjects = (tp.DndObjects != null) ? tp.DndObjects : new List<DndObject>();
+        this.ObjectsCategories = (tp.ObjectsCategories != null) ? tp.ObjectsCategories : new List<string>();
+        this.Avatars = (tp.Avatars != null) ? tp.Avatars : new List<Avatar>();
+        this.Attributes = (tp.Attributes != null) ? tp.Attributes : new List<Attribute>();
+        this.Items = (tp.Items != null) ? tp.Items : new List<Item>();
+        this.Effects = (tp.Effects != null) ? tp.Effects : new List<Effect>();
+        this.DndEvents = (tp.DndEvents != null) ? tp.DndEvents : new List<DndEvent>();
+        this.MinEventTime = (tp.MinEventTime > 0) ? tp.MinEventTime : DefaultMinTime;
+        this.MaxEventTime = (tp.MaxEventTime > 0) ? tp.MaxEventTime : DefaultMaxTime;
 
         PackNamer.text = tp.PackName;
         ShowLoadedPack();
@@ -148,8 +163,6 @@ public class PackConstructor : MonoBehaviour
 
     public void LoadPackTest()
     {
-        string extension = "hgd";
-        //var path = StandaloneFileBrowser.OpenFilePanel("Открыть пак", Application.dataPath, extension, false);
         OpenPack("C:\\Users\\Wyzzus\\Desktop\\testKek\\testKek.hgd");
     }
 
@@ -168,6 +181,7 @@ public class PackConstructor : MonoBehaviour
         ClearView(AttributeView);
         ClearView(ItemView);
         ClearView(EffectView);
+        ClearView(DndEventView);
 
         foreach (Location loc in Locations)
         {
@@ -209,6 +223,13 @@ public class PackConstructor : MonoBehaviour
             PartEffect pe = AddEffectPart();
             pe.MyEffect = obj;
             pe.UpdateEffect();
+        }
+
+        foreach (DndEvent obj in DndEvents)
+        {
+            PartDndEvent pe = AddDndEventPart();
+            pe.MyEvent = obj;
+            pe.UpdateDndEvent();
         }
     }
 
@@ -322,6 +343,23 @@ public class PackConstructor : MonoBehaviour
         RecalculateViewSize(EffectView, Effects.Count, 1, LocationPartHeight);
         GameObject clone = Instantiate(EffectEditorPartPrefab, EffectView);
         return clone.GetComponentInChildren<PartEffect>();
+    }
+
+    #endregion
+
+    #region Events
+
+    public void OpenDndEventEditor()
+    {
+        DndEventEditorWindow.SetActive(true);
+        //ItemEditorWindow.GetComponent<ItemEditor>().ShowAttributes();
+    }
+
+    public PartDndEvent AddDndEventPart()
+    {
+        RecalculateViewSize(DndEventView, DndEvents.Count, 1, LocationPartHeight);
+        GameObject clone = Instantiate(DndEventEditorPartPrefab, DndEventView);
+        return clone.GetComponentInChildren<PartDndEvent>();
     }
 
     #endregion

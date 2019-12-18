@@ -15,6 +15,10 @@ public class ThemePack
     public List<Attribute> Attributes = new List<Attribute>();
     public List<Item> Items = new List<Item>();
     public List<Effect> Effects = new List<Effect>();
+    public List<DndEvent> DndEvents = new List<DndEvent>();
+
+    public float MinEventTime;
+    public float MaxEventTime;
 
     public ThemePack()
     {
@@ -25,6 +29,10 @@ public class ThemePack
         Attributes = new List<Attribute>();
         Items = new List<Item>();
         Effects = new List<Effect>();
+        DndEvents = new List<DndEvent>();
+
+        MinEventTime = 120;
+        MaxEventTime = 180;
     }
 
     public ThemePack(
@@ -33,7 +41,10 @@ public class ThemePack
         List<DndObject> DndObjects, 
         List<string> ObjectsCategories, 
         List<Avatar> Avatars, 
-        List<Attribute> Attributes, List<Item> Items, List<Effect> Effects)
+        List<Attribute> Attributes, 
+        List<Item> Items, 
+        List<Effect> Effects,
+        List<DndEvent> DndEvents, float MinEventTime, float MaxEventTime)
     {
         this.PackName = PackName;
         this.Locations = Locations;
@@ -43,6 +54,9 @@ public class ThemePack
         this.Attributes = Attributes;
         this.Items = Items;
         this.Effects = Effects;
+        this.DndEvents = DndEvents;
+        this.MinEventTime = MinEventTime;
+        this.MaxEventTime = MaxEventTime;
     }
 
     public void SavePack(string Path, string Name, string Extension)
