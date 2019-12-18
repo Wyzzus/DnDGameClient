@@ -42,7 +42,8 @@ public class PackConstructor : MonoBehaviour
     public List<string> ObjectsCategories = new List<string>();
     public List<Avatar> Avatars = new List<Avatar>();
     public List<Attribute> Attributes = new List<Attribute>();
-    public List<Item> Items = new List<Item>(); 
+    public List<Item> Items = new List<Item>();
+    public List<Effect> Effects = new List<Effect>();
 
     [Header("Editors")]
     public GameObject LocationEditorWindow;
@@ -59,6 +60,9 @@ public class PackConstructor : MonoBehaviour
 
     public GameObject ItemEditorWindow;
     public GameObject ItemEditorPartPrefab;
+    
+    public GameObject EffectEditorWindow;
+    public GameObject EffectEditorPartPrefab;
 
     [Header("Tables Views")]
     public RectTransform LocationView;
@@ -66,6 +70,7 @@ public class PackConstructor : MonoBehaviour
     public RectTransform AvatarView;
     public RectTransform AttributeView;
     public RectTransform ItemView;
+    public RectTransform EffectView;
 
     public InputField PackNamer;
     
@@ -95,7 +100,7 @@ public class PackConstructor : MonoBehaviour
         }
         packPath += dirs[dirs.Length - 2];
         packName = dirs[dirs.Length - 1].Replace("." + extension, "");
-        ThemePack tp = new ThemePack(PackNamer.text, Locations, DndObjects, ObjectsCategories, Avatars, Attributes, Items);
+        ThemePack tp = new ThemePack(PackNamer.text, Locations, DndObjects, ObjectsCategories, Avatars, Attributes, Items, Effects);
         tp.SavePack(packPath, packName, extension);
         OpenPack(packPath);
 
@@ -134,6 +139,7 @@ public class PackConstructor : MonoBehaviour
         this.Avatars = tp.Avatars;
         this.Attributes = tp.Attributes;
         this.Items = tp.Items;
+        this.Effects = tp.Effects;
 
 
         PackNamer.text = tp.PackName;
@@ -144,7 +150,7 @@ public class PackConstructor : MonoBehaviour
     {
         string extension = "hgd";
         //var path = StandaloneFileBrowser.OpenFilePanel("Открыть пак", Application.dataPath, extension, false);
-        OpenPack("C:\\Users\\Wyzzus\\Desktop\\NewThemePack\\NewThemePack.hgd");
+        OpenPack("C:\\Users\\Wyzzus\\Desktop\\testKek\\testKek.hgd");
     }
 
     public void LoadPack()
@@ -161,6 +167,7 @@ public class PackConstructor : MonoBehaviour
         ClearView(AvatarView);
         ClearView(AttributeView);
         ClearView(ItemView);
+        ClearView(EffectView);
 
         foreach (Location loc in Locations)
         {
@@ -192,12 +199,20 @@ public class PackConstructor : MonoBehaviour
 
         foreach (Item obj in Items)
         {
-            PartItem pa = AddItemPart();
-            pa.MyItem = obj;
-            pa.UpdateItem();
+            PartItem pi = AddItemPart();
+            pi.MyItem = obj;
+            pi.UpdateItem();
+        }
+
+        foreach (Effect obj in Effects)
+        {
+            PartEffect pe = AddEffectPart();
+            pe.MyEffect = obj;
+            pe.UpdateEffect();
         }
     }
 
+    #region UI
     public void HideEditor(GameObject EditorWindow)
     {
         EditorWindow.SetActive(false);
@@ -207,6 +222,7 @@ public class PackConstructor : MonoBehaviour
     {
         View.sizeDelta = new Vector2(0, (Count + Offset) * PartHeight + 50f);
     }
+    #endregion
 
     #region Locations
 
@@ -289,6 +305,23 @@ public class PackConstructor : MonoBehaviour
         RecalculateViewSize(ItemView, Items.Count, 1, LocationPartHeight);
         GameObject clone = Instantiate(ItemEditorPartPrefab, ItemView);
         return clone.GetComponentInChildren<PartItem>();
+    }
+
+    #endregion
+
+    #region Effects
+
+    public void OpenEffectEditor()
+    {
+        EffectEditorWindow.SetActive(true);
+        //ItemEditorWindow.GetComponent<ItemEditor>().ShowAttributes();
+    }
+
+    public PartEffect AddEffectPart()
+    {
+        RecalculateViewSize(EffectView, Effects.Count, 1, LocationPartHeight);
+        GameObject clone = Instantiate(EffectEditorPartPrefab, EffectView);
+        return clone.GetComponentInChildren<PartEffect>();
     }
 
     #endregion
