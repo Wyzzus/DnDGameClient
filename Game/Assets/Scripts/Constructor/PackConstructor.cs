@@ -41,6 +41,8 @@ public class PackConstructor : MonoBehaviour
     public List<DndObject> DndObjects = new List<DndObject>();
     public List<string> ObjectsCategories = new List<string>();
     public List<Avatar> Avatars = new List<Avatar>();
+    public List<Attribute> Attributes = new List<Attribute>();
+    public List<Item> Items = new List<Item>(); 
 
     [Header("Editors")]
     public GameObject LocationEditorWindow;
@@ -52,10 +54,18 @@ public class PackConstructor : MonoBehaviour
     public GameObject AvatarEditorWindow;
     public GameObject AvatarEditorPartPrefab;
 
+    public GameObject AttributeEditorWindow;
+    public GameObject AttributeEditorPartPrefab;
+
+    public GameObject ItemEditorWindow;
+    public GameObject ItemEditorPartPrefab;
+
     [Header("Tables Views")]
     public RectTransform LocationView;
     public RectTransform DndObjectView;
     public RectTransform AvatarView;
+    public RectTransform AttributeView;
+    public RectTransform ItemView;
 
     public InputField PackNamer;
     
@@ -63,7 +73,7 @@ public class PackConstructor : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        LoadPackTest();
     }
 
     // Update is called once per frame
@@ -85,7 +95,7 @@ public class PackConstructor : MonoBehaviour
         }
         packPath += dirs[dirs.Length - 2];
         packName = dirs[dirs.Length - 1].Replace("." + extension, "");
-        ThemePack tp = new ThemePack(PackNamer.text, Locations, DndObjects, ObjectsCategories, Avatars);
+        ThemePack tp = new ThemePack(PackNamer.text, Locations, DndObjects, ObjectsCategories, Avatars, Attributes, Items);
         tp.SavePack(packPath, packName, extension);
         OpenPack(packPath);
 
@@ -122,10 +132,19 @@ public class PackConstructor : MonoBehaviour
         this.DndObjects = tp.DndObjects;
         this.ObjectsCategories = tp.ObjectsCategories;
         this.Avatars = tp.Avatars;
+        this.Attributes = tp.Attributes;
+        this.Items = tp.Items;
 
 
         PackNamer.text = tp.PackName;
         ShowLoadedPack();
+    }
+
+    public void LoadPackTest()
+    {
+        string extension = "hgd";
+        //var path = StandaloneFileBrowser.OpenFilePanel("Открыть пак", Application.dataPath, extension, false);
+        OpenPack("C:\\Users\\Wyzzus\\Desktop\\NewThemePack\\NewThemePack.hgd");
     }
 
     public void LoadPack()
@@ -140,6 +159,9 @@ public class PackConstructor : MonoBehaviour
         ClearView(LocationView);
         ClearView(DndObjectView);
         ClearView(AvatarView);
+        ClearView(AttributeView);
+        ClearView(ItemView);
+
         foreach (Location loc in Locations)
         {
             PartLocation pl = AddLocationPart();
@@ -159,6 +181,20 @@ public class PackConstructor : MonoBehaviour
             PartAvatar pa = AddAvatarPart();
             pa.MyAvatar = obj;
             pa.UpdateAvatar();
+        }
+
+        foreach (Attribute obj in Attributes)
+        {
+            PartAttribute pa = AddAttributePart();
+            pa.MyAttribute = obj;
+            pa.UpdateAttribute();
+        }
+
+        foreach (Item obj in Items)
+        {
+            PartItem pa = AddItemPart();
+            pa.MyItem = obj;
+            pa.UpdateItem();
         }
     }
 
@@ -220,6 +256,39 @@ public class PackConstructor : MonoBehaviour
         RecalculateViewSize(AvatarView, Avatars.Count, 1, LocationPartHeight);
         GameObject clone = Instantiate(AvatarEditorPartPrefab, AvatarView);
         return clone.GetComponentInChildren<PartAvatar>();
+    }
+
+    #endregion
+
+    #region Attributes
+
+    public void OpenAttributeEditor()
+    {
+        AttributeEditorWindow.SetActive(true);
+    }
+
+    public PartAttribute AddAttributePart()
+    {
+        RecalculateViewSize(AttributeView, Attributes.Count, 1, LocationPartHeight);
+        GameObject clone = Instantiate(AttributeEditorPartPrefab, AttributeView);
+        return clone.GetComponentInChildren<PartAttribute>();
+    }
+
+    #endregion
+
+    #region Items
+
+    public void OpenItemEditor()
+    {
+        ItemEditorWindow.SetActive(true);
+        //ItemEditorWindow.GetComponent<ItemEditor>().ShowAttributes();
+    }
+
+    public PartItem AddItemPart()
+    {
+        RecalculateViewSize(ItemView, Items.Count, 1, LocationPartHeight);
+        GameObject clone = Instantiate(ItemEditorPartPrefab, ItemView);
+        return clone.GetComponentInChildren<PartItem>();
     }
 
     #endregion

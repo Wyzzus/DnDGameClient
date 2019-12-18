@@ -12,21 +12,34 @@ public class ThemePack
     public List<DndObject> DndObjects = new List<DndObject>();
     public List<string> ObjectsCategories = new List<string>();
     public List<Avatar> Avatars = new List<Avatar>();
+    public List<Attribute> Attributes = new List<Attribute>();
+    public List<Item> Items = new List<Item>();
 
     public ThemePack()
     {
         Locations = new List<Location>();
         DndObjects = new List<DndObject>();
         ObjectsCategories = new List<string>();
+        Avatars = new List<Avatar>();
+        Attributes = new List<Attribute>();
+        Items = new List<Item>();
     }
 
-    public ThemePack(string PackName, List<Location> Locations, List<DndObject> DndObjects, List<string> ObjectsCategories, List<Avatar> Avatars)
+    public ThemePack(
+        string PackName, 
+        List<Location> Locations, 
+        List<DndObject> DndObjects, 
+        List<string> ObjectsCategories, 
+        List<Avatar> Avatars, 
+        List<Attribute> Attributes, List<Item> Items)
     {
         this.PackName = PackName;
         this.Locations = Locations;
         this.DndObjects = DndObjects;
         this.ObjectsCategories = ObjectsCategories;
         this.Avatars = Avatars;
+        this.Attributes = Attributes;
+        this.Items = Items;
     }
 
     public void SavePack(string Path, string Name, string Extension)
@@ -74,6 +87,14 @@ public class ThemePack
             File.Copy(obj.AvatarImage, NewPath);
             Debug.Log(NewPath);
             obj.AvatarImage = obj.AvatarName + "." + PackConstructor.instance.ImageExtension;
+        }
+
+        foreach (Item obj in Items)
+        {
+            string NewPath = ImageFolder + "\\" + obj.ItemName + "." + PackConstructor.instance.ImageExtension;
+            File.Copy(obj.ItemImage, NewPath);
+            Debug.Log(NewPath);
+            obj.ItemImage = obj.ItemName + "." + PackConstructor.instance.ImageExtension;
         }
 
 
@@ -131,6 +152,15 @@ public class ThemePack
             {
                 string NewPath = con.CurrentPackFolder + con.ImageFolder + "\\" + obj.AvatarName + "." + PackConstructor.instance.ImageExtension;
                 obj.AvatarImage = NewPath;
+            }
+        }
+
+        if (pack.Items != null)
+        {
+            foreach (Item obj in pack.Items)
+            {
+                string NewPath = con.CurrentPackFolder + con.ImageFolder + "\\" + obj.ItemName + "." + PackConstructor.instance.ImageExtension;
+                obj.ItemImage = NewPath;
             }
         }
 
