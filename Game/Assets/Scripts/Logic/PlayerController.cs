@@ -19,6 +19,9 @@ public class PlayerController : MonoBehaviour
     #region Game Variables
 
     [Header("Game Variables")]
+    public List<PlayerController> Players = new List<PlayerController>();
+    public PlayerController ChosenPlayer;
+
     public string Name;
     public int CurrentMap;
     public int CurrentAvatar;
@@ -27,6 +30,8 @@ public class PlayerController : MonoBehaviour
     public List<Attribute> Attributes = new List<Attribute>();
     public List<int> CurrentEffects = new List<int>();
     public string CurrentRoll;
+
+    public Image Map;
 
     public IEnumerator RollRoutine;
 
@@ -73,9 +78,31 @@ public class PlayerController : MonoBehaviour
     public GameObject ItemDescPanel;
     public GameObject EffectDescPanel;
 
+    #endregion
+
+    #region GM UI
+
+    [Header("GM UI")]
+    public Image GMItemIcon;
+    public Dropdown GMAvatarSelector;
+    public Dropdown LocationSelector;
+    public Text GMRollText;
+
+    public RectTransform PlayersView;
+    public RectTransform GMItemsView;
+    public RectTransform GMAttributesView;
+    public RectTransform GMEffectsView;
+
+    public RectTransform AddItemMenu;
+
+    public GameObject PlayerContainerPrefab;
+    public GameObject GMItemContainerPrefab;
+    public GameObject GMAttributeContainerPrefab;
+    public GameObject GMEffectContainerPrefab;
+    public GameObject GMAddItemPrefab;
 
     #endregion
-    // Start is called before the first frame update
+
     void Start()
     {
         con = PackConstructor.instance;
@@ -83,23 +110,55 @@ public class PlayerController : MonoBehaviour
         LoadAvatar(0);
         AddItem(0);
         AddItem(1);
-        AddItem(0);
-        AddItem(1);
-        //EquipItem(0);
         ShowItemDescription(ChosenItem);
         UpdateEffects();
         UpdateAttributes();
-        BlockAttributeEdit(true);
         AddEffect(0);
+
+        Players.Add(this);
+
+        //ChosenPlayer = this;
+
+        ShowPlayers();
+        //ShowPlayerInfo();
+        LoadLocation(0);
     }
 
+    void Update()
+    {
+        Movement();
+        RollText.text = CurrentRoll;
+        GMRollText.text = CurrentRoll;
+        if (ChosenItem == -1)
+            ItemDescPanel.SetActive(false);
+    }
+
+    public void Movement()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            if (Physics.Raycast(ray, out hit, layerMask))
+            {
+                NewPosition = new Vector3(hit.point.x, 0, hit.point.z);
+            }
+        }
+        transform.position = Vector3.Lerp(transform.position, NewPosition, Time.deltaTime * MoveDamp);
+    }
+
+    #region Player Methods
 
     #region MediaSelectors
 
     public void LoadAvatar(int n)
     {
-        StartCoroutine(LoadImage(CurrentThemePack.Avatars[n].AvatarImage, Avatar));
-        AvatarNum = n;
+        if (n >= 0)
+        {
+            StartCoroutine(LoadImage(CurrentThemePack.Avatars[n].AvatarImage, Avatar));
+            AvatarNum = n;
+        }
     }
 
     public void LoadAttributes()
@@ -113,13 +172,36 @@ public class PlayerController : MonoBehaviour
     public void SetupAvatarSelector()
     {
         AvatarSelector.ClearOptions();
+        GMAvatarSelector.ClearOptions();
+
+        List<Dropdown.OptionData> Opts = new List<Dropdown.OptionData>();
         foreach (Avatar ava in CurrentThemePack.Avatars)
         {
             Dropdown.OptionData data = new Dropdown.OptionData();
             data.text = ava.AvatarName;
-            AvatarSelector.options.Add(data);
+            Opts.Add(data);
         }
+
+        AvatarSelector.AddOptions(Opts);
+        GMAvatarSelector.AddOptions(Opts);
         AvatarSelector.value = 0;
+        GMAvatarSelector.value = 0;
+    }
+
+    public void SetupLocationSelector()
+    {
+        LocationSelector.ClearOptions();
+
+        List<Dropdown.OptionData> Opts = new List<Dropdown.OptionData>();
+        foreach (Location loc in CurrentThemePack.Locations)
+        {
+            Dropdown.OptionData data = new Dropdown.OptionData();
+            data.text = loc.LocationName;
+            Opts.Add(data);
+        }
+
+        LocationSelector.AddOptions(Opts);
+        LocationSelector.value = 0;
     }
 
     public void LoadItem(int n)
@@ -129,7 +211,8 @@ public class PlayerController : MonoBehaviour
     
     public void ShowItem(int n)
     {
-        StartCoroutine(LoadImage(CurrentThemePack.Items[n].ItemImage, ItemIcon));
+        if(n >= 0)
+            StartCoroutine(LoadImage(CurrentThemePack.Items[n].ItemImage, ItemIcon));
     }
 
     #endregion
@@ -147,9 +230,7 @@ public class PlayerController : MonoBehaviour
     public void RemoveItem(int n)
     {
         Items.Remove(n);
-
-        for (int i = 0; i < Attributes.Count; i++)
-            Attributes[i].AttributeValue -= CurrentThemePack.Items[n].Attributes[i].AttributeValue;
+        Debug.Log(CurrentThemePack.Items[n].ItemName + " was removed from " + Name);
 
         UpdateItems();
     }
@@ -159,7 +240,7 @@ public class PlayerController : MonoBehaviour
         if(Items.Count > 0)
         {
             RemoveItem(ChosenItem);
-            ChosenItem = 0;
+            ChosenItem = -1;
         }
         ItemIcon.sprite = null;
         ItemDescription.text = "";
@@ -189,6 +270,7 @@ public class PlayerController : MonoBehaviour
         UpdateItems();
         UpdateAttributes();
         ShowHideObject(ItemDescPanel);
+        ChosenItem = -1;
     }
 
     public void UnequipItem(int n)
@@ -298,6 +380,9 @@ public class PlayerController : MonoBehaviour
         ClearView(ItemsView);
         ClearView(EquipmentView);
 
+        Items.Sort();
+        Equipment.Sort();
+
         foreach(int n in Items)
         {
             GameObject clone = Instantiate<GameObject>(ItemContainerPrefab, ItemsView);
@@ -312,6 +397,8 @@ public class PlayerController : MonoBehaviour
             clone.GetComponent<ItemContainer>().Equiped = true;
         }
         EquipmentView.sizeDelta = new Vector2(EquipmentView.sizeDelta.x, Equipment.Count * ItemContainerHeight);
+
+        ChosenItem = -1;
     }
 
     public void UpdateAttributes()
@@ -330,6 +417,7 @@ public class PlayerController : MonoBehaviour
     public void UpdateEffects()
     {
         ClearView(EffectView);
+        CurrentEffects.Sort();
         foreach (int n in CurrentEffects)
         {
             GameObject clone = Instantiate<GameObject>(EffectContainerPrefab, EffectView);
@@ -339,29 +427,7 @@ public class PlayerController : MonoBehaviour
     }
 
     #endregion
-
-    // Update is called once per frame
-    void Update()
-    {
-        Movement();
-        RollText.text = CurrentRoll;
-    }
-
-    public void Movement()
-    {
-        if(Input.GetMouseButtonDown(1))
-        {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out hit, layerMask))
-            {
-                NewPosition = new Vector3(hit.point.x, 0, hit.point.z);
-            }
-        }
-        transform.position = Vector3.Lerp(transform.position, NewPosition, Time.deltaTime * MoveDamp);
-    }
-
+    
     #region ServiceMethods
 
     public void LoadPack()
@@ -369,6 +435,8 @@ public class PlayerController : MonoBehaviour
         CurrentThemePack = CurrentThemePack.LoadPack(packUrl);
         SetupAvatarSelector();
         LoadAttributes();
+        SetupLocationSelector();
+        LoadLocation(0);
     }
 
     public void IncreaseAttribute(int n, float value)
@@ -387,6 +455,17 @@ public class PlayerController : MonoBehaviour
         toImage.sprite = Sprite.Create(www.texture, new Rect(0, 0, www.texture.width, www.texture.height), new Vector2(0, 0));
     }
 
+    public IEnumerator LoadImage(string url, Sprite toImage)
+    {
+        url = con.GetPackFolder(packUrl) + "\\" + url;
+        //"file:///D://SampleImage.png"
+        WWW www = new WWW(url);
+        while (!www.isDone)
+            yield return null;
+        toImage = null;
+        toImage = Sprite.Create(www.texture, new Rect(0, 0, www.texture.width, www.texture.height), new Vector2(0, 0));
+    }
+
     public void ShowHideObject(GameObject obj)
     {
         obj.SetActive(!obj.activeSelf);
@@ -394,7 +473,7 @@ public class PlayerController : MonoBehaviour
 
     public void ShowItemDescription(int n)
     {
-        if (Items.Count > 0)
+        if (n >= 0)
         {
             ShowItem(n);
             string desc = CurrentThemePack.Items[n].ItemName;
@@ -440,6 +519,88 @@ public class PlayerController : MonoBehaviour
         foreach(AttributeContainer ac in attributeContainers)
         {
             ac.BlockAttributes(tf);
+        }
+    }
+
+    #endregion
+
+    #endregion
+
+    #region GM Methods
+
+    public void ShowPlayerInfo()
+    {
+        ShowAttributes(ChosenPlayer);
+        ShowItems(ChosenPlayer);
+        ShowEffects(ChosenPlayer);
+    }
+
+    public void ShowPlayers()
+    {
+        ClearView(PlayersView);
+
+        foreach(PlayerController pc in Players)
+        {
+            GameObject clone = Instantiate<GameObject>(PlayerContainerPrefab, PlayersView);
+            clone.GetComponent<PlayerContainer>().Setup(this, pc);
+        }
+    }
+
+    public void ShowAttributes(PlayerController pc)
+    {
+        ClearView(GMAttributesView);
+
+        foreach (Attribute n in pc.Attributes)
+        {
+            GameObject clone = Instantiate<GameObject>(GMAttributeContainerPrefab, GMAttributesView);
+            clone.GetComponent<GMAttributeContainer>().Setup(n);
+        }
+    }
+
+    public void ShowItems(PlayerController pc)
+    {
+        ClearView(GMItemsView);
+
+        foreach (int n in pc.Items)
+        {
+            GameObject clone = Instantiate<GameObject>(GMItemContainerPrefab, GMItemsView);
+            clone.GetComponent<GMItemContainer>().Setup(this, pc, n, false);
+        }
+
+        foreach (int n in pc.Equipment)
+        {
+            GameObject clone = Instantiate<GameObject>(GMItemContainerPrefab, GMItemsView);
+            clone.GetComponent<GMItemContainer>().Setup(this, pc, n, true);
+        }
+    }
+
+    public void ShowEffects(PlayerController pc)
+    {
+        ClearView(GMEffectsView);
+
+        foreach (int n in pc.CurrentEffects)
+        {
+            GameObject clone = Instantiate<GameObject>(GMEffectContainerPrefab, GMEffectsView);
+            clone.GetComponent<GMEffectContainer>().Setup(this, pc, n);
+        }
+    }
+
+    public void ShowSelectableItems()
+    {
+        ClearView(AddItemMenu);
+
+        for(int i = 0; i < CurrentThemePack.Items.Count; i++)
+        {
+            GameObject clone = Instantiate<GameObject>(GMAddItemPrefab, AddItemMenu);
+            clone.GetComponent<GMItemContainer>().Setup(this, ChosenPlayer, i, false);
+        }
+    }
+
+    public void LoadLocation(int n)
+    {
+        if (n >= 0)
+        {
+            StartCoroutine(LoadImage(CurrentThemePack.Locations[n].BackgroundImage, Map));
         }
     }
 
