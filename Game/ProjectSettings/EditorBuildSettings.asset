@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/PackConstructor.unity
     guid: ffb51b2bdb98fcf42bb937a230b5ccd9
+  - enabled: 1
+    path: Assets/Scenes/Game.unity
+    guid: 959e5013e0062e94c8483f418595d07b
   m_configObjects: {}
