@@ -27,7 +27,7 @@ public class ItemContainer : MonoBehaviour
         {
             MyController.ChosenItem = MyItem;
             MyController.ShowItemDescription(MyItem);
-            MyController.DescPanel.SetActive(true);
+            MyController.ItemDescPanel.SetActive(true);
         }
     }
 }
