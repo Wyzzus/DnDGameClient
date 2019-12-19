@@ -100,18 +100,25 @@ public class PackConstructor : MonoBehaviour
         
     }
 
+    public string GetPackFolder(string packPath)
+    {
+        string[] dirs = packPath.Split('\\');
+        string Folder = "";
+        for (int i = 0; i < dirs.Length - 2; i++)
+        {
+            Folder += dirs[i] + "\\";
+        }
+        Folder += dirs[dirs.Length - 2];
+        return Folder;
+    }
+
     public void SavePack()
     {
         string packName = "NewThemePack";
         string extension = "hgd";
         var paths = StandaloneFileBrowser.SaveFilePanel("Сохранить пак", Application.dataPath, packName, extension);
         string[] dirs = paths.Split('\\');
-        string packPath = "";
-        for(int i = 0; i < dirs.Length - 2; i++)
-        {
-            packPath += dirs[i] + "\\";
-        }
-        packPath += dirs[dirs.Length - 2];
+        string packPath = GetPackFolder(paths);
         packName = dirs[dirs.Length - 1].Replace("." + extension, "");
         ThemePack tp = new ThemePack(PackNamer.text, Locations, DndObjects, ObjectsCategories, Avatars, Attributes, Items, Effects, DndEvents, MinEventTime, MaxEventTime);
         tp.SavePack(packPath, packName, extension);
