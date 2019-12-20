@@ -117,12 +117,9 @@ public class PlayerController : NetworkBehaviour
         con = PackConstructor.instance;
         LoadPack();
         LoadAvatar(0);
-        //AddItem(0);
-        //AddItem(1);
         ShowItemDescription(ChosenItem);
         UpdateEffects();
         UpdateAttributes();
-        //AddEffect(0);
 
         Players.Add(this);
 
