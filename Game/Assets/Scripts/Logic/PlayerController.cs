@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 public enum PlayerType { Player, GameMaster}
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     #region Theme Pack
 
@@ -22,7 +23,7 @@ public class PlayerController : MonoBehaviour
     public List<PlayerController> Players = new List<PlayerController>();
     public PlayerController ChosenPlayer;
 
-    public string Name;
+    [SyncVar] public string Name;
     public int CurrentMap;
     public int CurrentAvatar;
     public List<int> Items = new List<int>();
@@ -55,6 +56,7 @@ public class PlayerController : MonoBehaviour
     #region Player UI
 
     [Header("Player UI")]
+    public GameObject PlayerUI;
     public List<AttributeContainer> attributeContainers = new List<AttributeContainer>();
     public Image ItemIcon;
     public Dropdown AvatarSelector;
@@ -83,6 +85,7 @@ public class PlayerController : MonoBehaviour
     #region GM UI
 
     [Header("GM UI")]
+    public GameObject GMUI;
     public Image GMItemIcon;
     public Dropdown GMAvatarSelector;
     public Dropdown LocationSelector;
@@ -103,30 +106,64 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+    }
+
     void Start()
     {
+        Map = GameObject.FindGameObjectWithTag("Map").GetComponent<Image>();
         con = PackConstructor.instance;
         LoadPack();
         LoadAvatar(0);
-        AddItem(0);
-        AddItem(1);
+        //AddItem(0);
+        //AddItem(1);
         ShowItemDescription(ChosenItem);
         UpdateEffects();
         UpdateAttributes();
-        AddEffect(0);
+        //AddEffect(0);
 
         Players.Add(this);
 
-        //ChosenPlayer = this;
-
         ShowPlayers();
-        //ShowPlayerInfo();
-        LoadLocation(0);
+        LoadLocation(1);
+    }
+
+    public void SetupType()
+    {
+        if (isServer)
+            Type = PlayerType.GameMaster;
+        else
+            Type = PlayerType.Player;
+
+        switch (Type)
+        {
+            case PlayerType.GameMaster:
+                GMUI.SetActive(true);
+                PlayerUI.SetActive(false);
+                break;
+            case PlayerType.Player:
+                GMUI.SetActive(false);
+                PlayerUI.SetActive(true);
+                break;
+        }
+
+        if (!isLocalPlayer)
+        {
+            GMUI.SetActive(false);
+            PlayerUI.SetActive(false);
+        }
     }
 
     void Update()
     {
-        Movement();
+        SetupType();
+        if(isLocalPlayer)
+            Movement();
+
+        PlayerName.text = Name;
+
         RollText.text = CurrentRoll;
         GMRollText.text = CurrentRoll;
         if (ChosenItem == -1)
@@ -359,10 +396,17 @@ public class PlayerController : MonoBehaviour
 
     #region UI Handlers
 
-    public void ShowName(string newName)
+    [ClientRpc]
+    public void RpcShowName(string newName)
+    {
+        Name = newName;
+        CmdSetNewName(Name);
+    }
+
+    [Command]
+    public void CmdSetNewName(string newName)
     {
         PlayerName.text = newName;
-        Name = newName;
     }
 
     public void ClearView(RectTransform view)
