@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using SFB;
 
 public enum PlayerType { Player, GameMaster}
 
@@ -111,10 +112,10 @@ public class PlayerController : NetworkBehaviour
         base.OnStartLocalPlayer();
     }
 
-    void Start()
+    public void StartPack()
     {
-        Map = GameObject.FindGameObjectWithTag("Map").GetComponent<Image>();
-        con = PackConstructor.instance;
+        var path = StandaloneFileBrowser.OpenFilePanel("Открыть пак", Application.dataPath, "hgd", false);
+        packUrl = path[0];
         LoadPack();
         LoadAvatar(0);
         ShowItemDescription(ChosenItem);
@@ -125,6 +126,13 @@ public class PlayerController : NetworkBehaviour
 
         ShowPlayers();
         LoadLocation(1);
+    }
+
+    void Start()
+    {
+        Map = GameObject.FindGameObjectWithTag("Map").GetComponent<Image>();
+        con = PackConstructor.instance;
+        
     }
 
     public void SetupType()
